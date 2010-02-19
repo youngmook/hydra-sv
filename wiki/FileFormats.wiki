@@ -1,4 +1,5 @@
 #summary Hydra input and output file definitions
+#labels Featured
 
 <wiki:toc>
 
