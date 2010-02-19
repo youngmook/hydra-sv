@@ -1,0 +1,93 @@
+#summary Hydra input and output file definitions
+
+<wiki:toc>
+
+<br>
+=Hydra input file format=
+Hydra currently expects a *tab-delimited* input text file describing that includes *only discordant paired-end mappings*.  Future versions will ultimately be based on SAM/BAM input files.
+
+|| *Field Nbr.* || *Field Name* || *Description* ||
+|| 1. || chrom1 || Chromosome for end 1 ||
+|| 2. || start1 || Start position for end 1 ||
+|| 3. || end1 || End position for end 1 ||
+|| 4. || chrom2 || Chromosome for end 2 ||
+|| 5. || start2 || Start position for end 2 ||
+|| 6. || end1 || End position for end 2 ||
+|| 7. || name || Name of the pair ||
+|| 8. || mate1End || To which mate of the pair do fields 1,2,3,9,11 correspond? (values: 1 or 2) ||
+|| 9. || strand1 || Orientation for end 1 (+ or -) ||
+|| 10. || strand2 || Orientation for end 2 (+ or -) ||
+|| 11. || editDist1 || Alignment edit distance for end 1 (can be extracted from NM tag in SAM) ||
+|| 12. || editDist2 || Alignment edit distance for end 2 (can be extracted from NM tag in SAM) ||
+
+*Example input file data:*
+{{{
+chr2    144494477       144494519       chr2    144495361       144495403       113100100881914    2       +       -       0       0       
+chr16   91448892        91448934        chr11   21386025        21386067        113100100870284    1       +       -       0       0       
+chr8    125953105       125953147       chr8    125954583       125954625       113100100781853    2       +       -       0       1       
+chr1    133543151       133543193       chr8    125953105       125953147       113100100781853    1       +       +       1       0       
+chr5    98625244        98625286        chrX    7971907 7971949 113100100750512    1       -       +       0       0       
+chr5    77697526        77697568        chr5    77704261        77704303        113100101640929    1       +       -       1       0       
+chr5    41154266        41154308        chr3    76024969        76025011        113100101661135    1       -       +       0       0       
+chr11   9219002 9219044 chr1    158568331       158568373       113100101751675    1       -       -       0       0       
+chr2    109719983       109720025       chr10   14800365        14800407        113100100411933    1       +       +       0       0       
+chr2    109719983       109720025       chr10   14805392        14805434        113100100411933    1       +       +       0       0       
+chr2    109719983       109720025       chr10   21456086        21456128        113100100411933    1       +       +       0       0       
+chr2    109719983       109720025       chr10   69791656        69791698        113100100411933    1       +       +       0       0
+}}}
+
+
+
+<br>
+<br>
+=Hydra breakpoint output file format=
+
+|| *Field Nbr.* || *Field Name* || *Description* ||
+|| 1. || chrom1 || Chromosome for end 1 of the breakpoint. ||
+|| 2. || start1 || Start position for end 1 of the breakpoint. ||
+|| 3. || end1 || End position for end 1 of the breakpoint. ||
+|| 4. || chrom2 || Chromosome for end 2 of the breakpoint. ||
+|| 5. || start2 || Start position for end 2 of the breakpoint. ||
+|| 6. || end2 || End position for end 2 of the breakpoint. ||
+|| 7. || breakpointId || Unique Hydra breakpoint identifier. ||
+|| 8. || numDistinctPairs || Number of distinct pairs in breakpoint. ||
+|| 9. || strand1 || Orientation for the first end of the breakpoint. ||
+|| 10. || strand2 || Orientation for the second end of the breakpoint. ||
+|| 11. || meanEditDist1 || Mean edit distance observed in end1 of the breakpoint pairs. ||
+|| 12. || meanEditDist2 || Mean edit distance observed in end2 of the breakpoint pairs. ||
+|| 13. || meanMappings1 || Mean number of mappings for end1 of all pairs in the breakpoint. ||
+|| 14. || meanMappings2 || Mean number of mappings for end2 of all pairs in the breakpoint. || 
+|| 15. || breakpointSize || Size of the breakpoint. ||
+|| 16. || numMappings || Total number of mappings included in the breakpoint. ||
+|| 17. || allWeightedSupport || Amount of _weighted_ support from the mappings in the breakpoint. ||
+|| 18. || finalSupport || Amount of _final_ support from the mappings in the breakpoint. ||
+|| 19. || finalWeightedSupport || Amount of _final weighted_ support from the mappings in the breakpoint. ||
+|| 20. || numUniquePairs || Number of pairs in the breakpoint that were uniquely mapped to the genome. || 
+|| 21. || numAnchoredPairs || Number of pairs in the breakpoint that were mapped to the genome in an "anchored" fashion (i.e. 1xN). ||
+|| 22. || numMultiplyMappedPairs || Number of pairs in the breakpoint that were multiply mapped to the genome in fashion (i.e. NxN). ||
+
+
+
+<br>
+<br>
+=Hydra breakpoint output detail file format=
+Hydra currently expects a *tab-delimited* input text file describing that includes *only discordant paired-end mappings*.  Future versions will ultimately be based on SAM/BAM input files.
+
+|| *Field Nbr.* || *Field Name* || *Description* ||
+|| 1. || chrom1 || Chromosome for end 1 ||
+|| 2. || start1 || Start position for end 1 ||
+|| 3. || end1 || End position for end 1 ||
+|| 4. || chrom2 || Chromosome for end 1 ||
+|| 5. || start2 || Start position for end 2 ||
+|| 6. || end1 || End position for end 2 ||
+|| 7. || name || Name of the pair ||
+|| 8. || mate1End || To which mate of the pair do fields 1,2,3,9,11 correspond? (values: 1 or 2) ||
+|| 9. || strand1 || Orientation for end 1 (+ or -) ||
+|| 10. || strand2 || Orientation for end 2 (+ or -) ||
+|| 11. || editDist1 || Alignment edit distance for end 1 (can be extracted from NM tag in SAM) ||
+|| 12. || editDist2 || Alignment edit distance for end 2 (can be extracted from NM tag in SAM) ||
+|| 13. || numMappings1 || Number of mappings for end 1 of this pair ||
+|| 14. || numMappings2 || Number of mappings for end 2 of this pair ||
+|| 15. || mappingType  || What type of mapping is this? (1=unique, 2=anchored, 3-multiply) ||
+|| 16. || includedInBreakpoint || Was this pair ultimately included in this breakpoint? ||
+|| 17. || breakpointId || Unique Hydra breakpoint identifier. ||
