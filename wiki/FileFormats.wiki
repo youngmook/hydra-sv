@@ -7,6 +7,8 @@
 =Hydra input file format=
 Hydra currently expects a *tab-delimited* input text file describing that includes *only discordant paired-end mappings*.  Future versions will ultimately be based on SAM/BAM input files.
 
+*NOTE: The input file must be sorted (or just grouped) by the name column (#7).*
+
 || *Field Nbr.* || *Field Name* || *Description* ||
 || 1. || chrom1 || Chromosome for end 1 ||
 || 2. || start1 || Start position for end 1 ||
