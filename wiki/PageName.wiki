@@ -1,0 +1,10 @@
+#summary Hydra Glossary.
+#labels Featured
+<br>
+
+=Definitions=
+|| *Term* || *Definition in this context* ||
+|| _Read-pair_ || A DNA molecule where a small portion (typically <= 100bp) of the 5' ends have been sequenced, but the entire molecule has not. ||
+|| _Concordant_ || A _concordant_ read-pair is aligned to the reference genome with the expected distance and orientation. ||
+|| _Discordant_ || A _discordant_ read-pair is *not* aligned to the reference genome with the expected distance and orientation. Clusters of discordant mappings suggest putative SV. ||
+|| _PEM_ || Paired-end mapping.  The alignment of each end of a read-pair. ||
