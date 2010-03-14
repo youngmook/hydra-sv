@@ -1,6 +1,8 @@
 #summary Below is a description of a typical workflow/pipeline for detecting SV breakpoints with Hydra
 #labels Featured
 
+<br><br>
+
   # *Tier 1 alignment*. Align your paired-end reads to the reference genome with a fast and reasonably sensitive aligner (e.g.,  [http://bio-bwa.sourceforge.net/ BWA]). This step serves as an initial pass towards identifying concordant pairs.
   # *Tier 2 alignment*. Grab the discordant alignments from the tier 1 BAM files and create FASTQ files for the discordant pairs.  Align the tier 1 discordant pairs with a more sensitive aligner such as [http://www.novocraft.com Novoalign] or [http://code.google.com/p/mosaik-aligner/ Mosaik] using a word size of no more than 15bp (we typically use 14 with Novoalign at this stage). We find this to be a necessary step as many concordant pairs are missed by BWA and can lead to false positive SV calls. At this point, you are merely trying to eliminate remaining concordant pairs.  Thus, if using Novoalign, you should use the "-r Random" alignment mode.  Below is an example for creating discordant FASTQ files from the tier1 discordant alignments:
 {{{
