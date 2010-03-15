@@ -18,11 +18,15 @@ $ bamToBed -i tier3.disc.bam -ed | pairDiscordants.py -i stdin -m hydra [OPTIONS
 $ sort -k1,1 -k4,4 -k2,2n -k5,5n -k9,9 -k10,10 disc.bedpe > disc.sorted.bedpe
 $ dedupBedPeButKeepBest.py -i disc.sorted.bedpe [OPTIONS] > disc.deduped.bedpe
 }}}
+  # *Remove alignments where both ends are in simple sequence repeats (opt., but strongly suggested).* SSRs and VNTRs are hyper-variable and prone to misassembly.  Consequently, a substantial number of spurious variants are often observed owing to SSR misassembly if mappings that touch SSRs on both ends are not removed prior to Hydra. We recommend using the pairToBed utility in BEDTools to do this.
+{{{
+$ pairToBed -a disc.deduped.bedpe -b SSRs.bed -type notboth | cut -f 1-12 > disc.deduped.noSSR.bedpe
+}}}
   # *Resort your discordant mappings by read-pair id*
 {{{
-$ sort -7,7 disc.deduped.bedpe > disc.deduped.sortedById.bedpe
+$ sort -7,7 disc.deduped.noSSR.bedpe > disc.deduped.noSSR.sortedById.bedpe
 }}}
   # *Detect SV breakpoints with Hydra*
 {{{
-$ hydra -i disc.deduped.sortedById.bedpe [OPTIONS]
+$ hydra -i disc.deduped.noSSR.sortedById.bedpe [OPTIONS]
 }}}
