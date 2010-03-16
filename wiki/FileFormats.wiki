@@ -74,7 +74,7 @@ chr2    109719983       109720025       chr10   69791656        69791698        
 <br>
 <br>
 =Hydra breakpoint output detail file format=
-Hydra currently expects a *tab-delimited* input text file describing that includes *only discordant paired-end mappings*.  Future versions will ultimately be based on SAM/BAM input files.
+
 
 || *Field Nbr.* || *Field Name* || *Description* ||
 || 1. || chrom1 || Chromosome for end 1 ||
