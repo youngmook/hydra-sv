@@ -22,7 +22,7 @@ $ dedupDiscordants.py -i disc.sorted.bedpe [OPTIONS] > disc.deduped.bedpe
 {{{
 $ pairToBed -a disc.deduped.bedpe -b SSRs.bed -type notboth | cut -f 1-12 > disc.deduped.noSSR.bedpe
 }}}
-  # *Resort your discordant mappings by read-pair id*
+  # *Re-sort your discordant mappings by read-pair id*
 {{{
 $ sort -7,7 disc.deduped.noSSR.bedpe > disc.deduped.noSSR.sortedById.bedpe
 }}}
