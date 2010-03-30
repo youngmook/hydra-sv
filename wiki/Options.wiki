@@ -8,7 +8,7 @@ $ hydra [OPTIONS] -in <mappings> -out <breakpoints> -mld <bp> -mno <bp>
 *Required:*
 
 || -in	|| Input file of discordant mappings. [http://code.google.com/p/hydra-sv/wiki/FileFormats#Hydra_input_file_format Details.]||
-|| -out	|| Stub for Hydra output files. [http://code.google.com/p/hydra-sv/wiki/FileFormats#Hydra_output_file_format Details.] ||
+|| -out	|| Stub for Hydra output files. [http://code.google.com/p/hydra-sv/wiki/FileFormats#Hydra_output_files Details.] ||
 || -mld	||Maximum allowable length difference b/w mappings. Typically set to 10 X m.a.d. of the DNA fragment libraries.||
 || -mno	|| Maximum allowable non-overlap b/w mappings. Typically set to median + (20 X m.a.d.) of the DNA fragment libraries.||
 
