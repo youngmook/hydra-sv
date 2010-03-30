@@ -7,3 +7,4 @@
 || _Concordant_ || A _concordant_ read-pair is aligned to the reference genome with the expected distance and orientation. ||
 || _Discordant_ || A _discordant_ read-pair is *not* aligned to the reference genome with the expected distance and orientation. Clusters of discordant mappings suggest putative SV. ||
 || _PEM_ || Paired-end mapping.  The alignment of each end of a read-pair. ||
+|| M.A.D. || Median absolute deviation. A better estimate of variance in fragment libraries. See: http://en.wikipedia.org/wiki/Median_absolute_deviation||
