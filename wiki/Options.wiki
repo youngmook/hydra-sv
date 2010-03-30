@@ -1,0 +1,5 @@
+#summary Command line options for Hydra.
+
+= Introduction =
+
+To do.
