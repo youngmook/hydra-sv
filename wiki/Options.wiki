@@ -12,7 +12,6 @@ $ hydra [OPTIONS] -in <mappings> -out <breakpoints> -mld <bp> -mno <bp>
 || -mld	||Maximum allowable length difference b/w mappings. Typically set to 10 X m.a.d. of the DNA fragment libraries.||
 || -mno	|| Maximum allowable non-overlap b/w mappings. Typically set to median + (20 X m.a.d.) of the DNA fragment libraries.||
 
-<br>
 
 *Options:*
 
