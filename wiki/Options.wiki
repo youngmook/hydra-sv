@@ -1,5 +1,33 @@
 #summary Command line options for Hydra.
 
-= Introduction =
 
-To do.
+*Usage*:   hydra [OPTIONS] -in <mappings> -out <breakpoints> -mld <bp> -mno <bp>
+
+Options:
+  -in	File of discordant mappings.
+  -out	Stub for output files.
+  -mld	Maximum allowable length difference b/w mappings.
+  	Typically set to 10 * m.a.d. of the DNA fragment libraries.
+  	see: http://en.wikipedia.org/wiki/Median_absolute_deviation
+
+  -mno	Maximum allowable non-overlap b/w mappings.
+  	Typically set to median + (20 * m.a.d.) of the DNA fragment libraries.
+
+  -ms	Minimum number of pairs required for variant to be called.
+	Default: 2
+
+  -lnk	Maximum intrachromosomal distance allowed before a
+  	variant is considered to be between unlinked DNA segments.
+  	Default: 1000000 (i.e., 1Mb)
+
+  -is	Choose most likely variant (when a tie exists) based on
+  	least edit distance rather than size.
+
+  -li	Combine +/+ and -/- mappings when screening for inversions.
+  	This increases sensitivity in low coverage.
+
+  -use	Which mappings should be used for each pair?
+  	"best"	Use the mappings with the least edit distance for each pair.
+  		Default.
+  	"all"	Use all mappings for each pair.
+  	<INT>	Use the best plus those within <INT> edit distance of best.
