@@ -1,6 +1,9 @@
 #summary Summary of revisions to Hydra.
 #labels Featured
 
+*Version 0.5.2 (Apr-13-2010)*
+  # Fixed bug/typo in dedupDiscordants.py.
+
 *Version 0.5.1 (Mar-20-2010)*
   # Fixed bug that caused a single breakpoint to be erroneously split into multiple breakpoints.
   # Improved logic for determining the type of pair (anchor, unique, etc.) based on the mappings present.
