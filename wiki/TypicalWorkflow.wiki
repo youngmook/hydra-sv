@@ -18,14 +18,14 @@ $ bamToBed -i tier3.disc.bam -ed | pairDiscordants.py -i stdin -m hydra [OPTIONS
 }}}
   # *Remove alignments where both ends are in simple sequence repeats (opt., but strongly suggested).* SSRs and VNTRs are hyper-variable and prone to misassembly.  Consequently, a substantial number of spurious variants are often observed owing to SSR misassembly if mappings that touch SSRs on both ends are not removed prior to Hydra. We recommend using the pairToBed utility in BEDTools to do this.
 {{{
-$ pairToBed -a disc.deduped.bedpe -b SSRs.bed -type notboth | cut -f 1-12 > disc.noSSR.bedpe
+$ pairToBed -a disc.bedpe -b SSRs.bed -type notboth | cut -f 1-12 > disc.noSSR.bedpe
 }}}
   # *Remove PCR and sequencing duplicates.*
 {{{
-$ dedupDiscordants.py -i disc.noSSR.sorted.bedpe [OPTIONS] > disc.noSSR.deduped.bedpe
+$ dedupDiscordants.py -i disc.noSSR.bedpe [OPTIONS] > disc.noSSR.deduped.bedpe
 }}}
   # *Detect SV breakpoints with Hydra*
 {{{
-$ hydra -i disc.deduped.noSSR.sortedById.bedpe [OPTIONS]
+$ hydra -i disc.deduped.noSSR.deduped.bedpe [OPTIONS]
 }}}
   # *Characterize/classify Hydra breakpoints with [http://code.google.com/p/bedtools BEDTools], Galaxy, UCSC Genome Browser, etc.* For example, use transposon annotations to distinguish true deletions in an experimental genome versus transposon insertions in the reference genome.
