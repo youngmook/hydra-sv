@@ -14,7 +14,7 @@ $ samtools view -bF 0x2 <tier2.bam> | bamToFastq -bam stdin -fq1 tier2.disc.1.fq
 }}}
   # *Create all discordant mapping combinations for each discordant read-pair.* Use the pairDiscordants.py script to screen for remaining concordant pairs and for all discordant pairs, create the mapping combinations for SV detection with Hydra.  pairDiscordants.py allows you to set the upper (-z) and lower (-y) bound for concordants (this should be derived by plotting the alignment distance of your pairs and computing median and m.a.d. values).  It also allows you to set the maximum number of mapping positions allowed for a given discordant pair.  We typically set this to 1000 (-n).  Use the "-m hydra" option to create output that is appropriate for use with Hydra. 
 {{{
-$ bamToBed -i tier3.disc.nameSorted.bam -tage NM | pairDiscordants.py -i stdin -m hydra [OPTIONS] > disc.bedpe
+$ bamToBed -i tier3.disc.nameSorted.bam -tag NM | pairDiscordants.py -i stdin -m hydra [OPTIONS] > disc.bedpe
 }}}
   # *Remove alignments where both ends are in simple sequence repeats (opt., but strongly suggested).* SSRs and VNTRs are hyper-variable and prone to misassembly.  Consequently, a substantial number of spurious variants are often observed owing to SSR misassembly if mappings that touch SSRs on both ends are not removed prior to Hydra. We recommend using the pairToBed utility in BEDTools to do this.
 {{{
