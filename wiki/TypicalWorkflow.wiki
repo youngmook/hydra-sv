@@ -23,9 +23,10 @@ The pipeline below is based upon BWA and Novoalign, but is not meant to suggest 
 <br>
 
 
-*An example pipeline.* The "$" denotes the command line prompt.
+=An example pipeline.=
+The "$" denotes the command line prompt.
 
-  * *Tier 1 alignment*. This initial alignet step is meant to quickly identify (and remove) concordant readpairs from your alignment. Align your paired-end reads to the reference genome with a fast and reasonably sensitive aligner (e.g.,  [http://bio-bwa.sourceforge.net/ BWA] or [http://bowtie-bio.sourceforge.net/index.shtml Bowtie]). Here is an example for the BWA aligner against hg18 (assuming you have already created a BWT index of the genome).  We will create a BAM file by piping the BWA output directly to samtools.  
+*Tier 1 alignment*. This initial alignet step is meant to quickly identify (and remove) concordant readpairs from your alignment. Align your paired-end reads to the reference genome with a fast and reasonably sensitive aligner (e.g.,  [http://bio-bwa.sourceforge.net/ BWA] or [http://bowtie-bio.sourceforge.net/index.shtml Bowtie]). Here is an example for the BWA aligner against hg18 (assuming you have already created a BWT index of the genome).  We will create a BAM file by piping the BWA output directly to samtools.  
 
 *Note:* After tier1 alignment, one should compute the fragment size distribution of your library from the "proper/concordant" pairs.  These statistics (median and stdev or MAD) will be used by Hydra to know the variance of discordant pairs that support the same breakpoint.
 
@@ -39,7 +40,7 @@ $ bwa sampe hg18 sample.1.sai sample.2.sai sample.1.fq sample.2.fq | \
 
 <br>
 
-  * *Tier 2 alignment*. Grab the discordant alignments from the *tier 1* BAM files and create FASTQ files for the discordant pairs.  Align the tier 1 discordant pairs with a more sensitive aligner such as [http://www.novocraft.com Novoalign] or [http://code.google.com/p/mosaik-aligner/ Mosaik] using a word size of no more than 15bp (we typically use 11-14 with Novoalign at this stage). We find this to be a necessary step as many concordant pairs are missed in the first tier (a consequence of the tradeoff b/w speed and senitivity). In turn, these missed concordant pairs lead to false positive SV calls. At this point, you are merely trying to eliminate remaining concordant pairs.  Thus, if using Novoalign, you should use the "-r Random" alignment mode.  Below is an example for creating discordant FASTQ files from the tier1 discordant alignments and then aligning those reads to hg18 with Novoalign.  This assumes we have created an index of hg18 with novoindex using kmer size 14 and step size 1.  Let's assume that in step 1, you determine that your fragment library has a median of 500 and a standard deviation of 50.
+*Tier 2 alignment*. Grab the discordant alignments from the *tier 1* BAM files and create FASTQ files for the discordant pairs.  Align the tier 1 discordant pairs with a more sensitive aligner such as [http://www.novocraft.com Novoalign] or [http://code.google.com/p/mosaik-aligner/ Mosaik] using a word size of no more than 15bp (we typically use 11-14 with Novoalign at this stage). We find this to be a necessary step as many concordant pairs are missed in the first tier (a consequence of the tradeoff b/w speed and senitivity). In turn, these missed concordant pairs lead to false positive SV calls. At this point, you are merely trying to eliminate remaining concordant pairs.  Thus, if using Novoalign, you should use the "-r Random" alignment mode.  Below is an example for creating discordant FASTQ files from the tier1 discordant alignments and then aligning those reads to hg18 with Novoalign.  This assumes we have created an index of hg18 with novoindex using kmer size 14 and step size 1.  Let's assume that in step 1, you determine that your fragment library has a median of 500 and a standard deviation of 50.
 
 {{{
 $ samtools view -uF 2 sample.tier1.bam | \
@@ -56,14 +57,14 @@ $ novoalign -c <THREADS> -d hg18.k14s1 \
 
 <br>
 
-  * *Tier 3 alignment*.  Grab the discordant alignments from the *tier 2* BAM files and create FASTQ files for the discordant pairs. Align the tier 2 discordant pairs with the same aligner from step 2 (or a more sensitive tool if you have the CPU cycles).  In this stage, however, we want to track *_all_* discordant alignment positions and use even more sensitive parameters such that any remaining "crypic" concordant pairs are detectable.  Retaining multiple mapping positions for the discordant pairs will allow us to detect SV involving duplicated/repetitive sequences such as segmental duplications and transposable elements.  Clearly this is an optional step: if you don't care about SV in duplicated sequence, only retain uniquely aligned reads---Hydra will work nonetheless.  If possible (i.e, if you have a sufficient number of CPUs), you should decrease the word size used for alignment to further eliminate remaining concordant pairs that may exist solely because a larger alignment seed was previously missed owing to sequence errors and/or polymorphism.  If using Novoalign, we recommend the following settings: -rE and -t at least 180, perhaps up to 300.
+*Tier 3 alignment*.  Grab the discordant alignments from the *tier 2* BAM files and create FASTQ files for the discordant pairs. Align the tier 2 discordant pairs with the same aligner from step 2 (or a more sensitive tool if you have the CPU cycles).  In this stage, however, we want to track *_all_* discordant alignment positions and use even more sensitive parameters such that any remaining "crypic" concordant pairs are detectable.  Retaining multiple mapping positions for the discordant pairs will allow us to detect SV involving duplicated/repetitive sequences such as segmental duplications and transposable elements.  Clearly this is an optional step: if you don't care about SV in duplicated sequence, only retain uniquely aligned reads---Hydra will work nonetheless.  If possible (i.e, if you have a sufficient number of CPUs), you should decrease the word size used for alignment to further eliminate remaining concordant pairs that may exist solely because a larger alignment seed was previously missed owing to sequence errors and/or polymorphism.  If using Novoalign, we recommend the following settings: -rE and -t at least 180, perhaps up to 300.
 {{{
 $ samtools view -bF 0x2 <tier2.bam> | bamToFastq -bam stdin -fq1 tier2.disc.1.fq -fq2 tier2.disc.2.fq 
 }}}
 
 <br>
 
-  * *Create all discordant mapping combinations for each discordant read-pair.* Use the pairDiscordants.py script to screen for remaining concordant pairs and for all discordant pairs, create the mapping combinations for SV detection with Hydra.  pairDiscordants.py allows you to set the upper (-z) and lower (-y) bound for concordants (this should be derived by plotting the alignment distance of your pairs and computing median and m.a.d. values).  It also allows you to set the maximum number of mapping positions allowed for a given discordant pair.  We typically set this to 1000 (-n).  Use the "-m hydra" option to create output that is appropriate for use with Hydra. 
+*Create all discordant mapping combinations for each discordant read-pair.* Use the pairDiscordants.py script to screen for remaining concordant pairs and for all discordant pairs, create the mapping combinations for SV detection with Hydra.  pairDiscordants.py allows you to set the upper (-z) and lower (-y) bound for concordants (this should be derived by plotting the alignment distance of your pairs and computing median and m.a.d. values).  It also allows you to set the maximum number of mapping positions allowed for a given discordant pair.  We typically set this to 1000 (-n).  Use the "-m hydra" option to create output that is appropriate for use with Hydra. 
 {{{
 $ bamToBed -i tier3.disc.nameSorted.bam -tag NM | pairDiscordants.py -i stdin -m hydra [OPTIONS] > disc.bedpe
 }}}
@@ -71,7 +72,7 @@ $ bamToBed -i tier3.disc.nameSorted.bam -tag NM | pairDiscordants.py -i stdin -m
 <br>
 
 
-  * *Remove alignments where both ends are in simple sequence repeats (opt., but strongly suggested).* SSRs and VNTRs are hyper-variable and prone to misassembly.  Consequently, a substantial number of spurious variants are often observed owing to SSR misassembly if mappings that touch SSRs on both ends are not removed prior to Hydra. We recommend using the pairToBed utility in BEDTools to do this.
+*Remove alignments where both ends are in simple sequence repeats (opt., but strongly suggested).* SSRs and VNTRs are hyper-variable and prone to misassembly.  Consequently, a substantial number of spurious variants are often observed owing to SSR misassembly if mappings that touch SSRs on both ends are not removed prior to Hydra. We recommend using the pairToBed utility in BEDTools to do this.
 {{{
 $ pairToBed -a disc.bedpe -b SSRs.bed -type notboth | cut -f 1-12 > disc.noSSR.bedpe
 }}}
@@ -79,7 +80,7 @@ $ pairToBed -a disc.bedpe -b SSRs.bed -type notboth | cut -f 1-12 > disc.noSSR.b
 <br>
 
 
-  * *Remove PCR and sequencing duplicates.*
+*Remove PCR and sequencing duplicates.*
 {{{
 $ dedupDiscordants.py -i disc.noSSR.bedpe [OPTIONS] > disc.noSSR.deduped.bedpe
 }}}
@@ -87,11 +88,11 @@ $ dedupDiscordants.py -i disc.noSSR.bedpe [OPTIONS] > disc.noSSR.deduped.bedpe
 <br>
 
 
-  * *Detect SV breakpoints with Hydra*
+*Detect SV breakpoints with Hydra*
 {{{
 $ hydra -i disc.deduped.noSSR.deduped.bedpe [OPTIONS]
 }}}
 
 <br>
 
-  * *Characterize/classify Hydra breakpoints with [http://code.google.com/p/bedtools BEDTools], Galaxy, UCSC Genome Browser, etc.* For example, use transposon annotations to distinguish true deletions in an experimental genome versus transposon insertions in the reference genome.
+*Characterize/classify Hydra breakpoints with [http://code.google.com/p/bedtools BEDTools], Galaxy, UCSC Genome Browser, etc.* For example, use transposon annotations to distinguish true deletions in an experimental genome versus transposon insertions in the reference genome.
