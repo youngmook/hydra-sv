@@ -25,18 +25,34 @@ The pipeline below is based upon BWA and Novoalign, but is not meant to suggest 
 
 *An example pipeline.* The "$" denotes the command line prompt.
 
-  # *Tier 1 alignment*. This initial alignet step is meant to quickly identify (and remove) concordant readpairs from your alignment. Align your paired-end reads to the reference genome with a fast and reasonably sensitive aligner (e.g.,  [http://bio-bwa.sourceforge.net/ BWA] or [http://bowtie-bio.sourceforge.net/index.shtml Bowtie]). Here is an example for the BWA aligner against hg18 (assuming you have already created a BWT index of the genome).  We will create a BAM file by piping the BWA output directly to samtools.
+  # *Tier 1 alignment*. This initial alignet step is meant to quickly identify (and remove) concordant readpairs from your alignment. Align your paired-end reads to the reference genome with a fast and reasonably sensitive aligner (e.g.,  [http://bio-bwa.sourceforge.net/ BWA] or [http://bowtie-bio.sourceforge.net/index.shtml Bowtie]). Here is an example for the BWA aligner against hg18 (assuming you have already created a BWT index of the genome).  We will create a BAM file by piping the BWA output directly to samtools.  
+
+*Note:* After tier1 alignment, one should compute the fragment size distribution of your library from the "proper/concordant" pairs.  These statistics (median and stdev or MAD) will be used by Hydra to know the variance of discordant pairs that support the same breakpoint.
+
+
 {{{
 $ bwa aln -t <THREADS> hg18 sample.1.fq > sample.1.sai
 $ bwa aln -t <THREADS> hg18 sample.2.fq > sample.2.sai
 $ bwa sampe hg18 sample.1.sai sample.2.sai sample.1.fq sample.2.fq | \
-      samtools view -Sb - > sample.bam 
+      samtools view -Sb - > sample.tier1.bam 
 }}}
 
-  # *Tier 2 alignment*. Grab the discordant alignments from the *tier 1* BAM files and create FASTQ files for the discordant pairs.  Align the tier 1 discordant pairs with a more sensitive aligner such as [http://www.novocraft.com Novoalign] or [http://code.google.com/p/mosaik-aligner/ Mosaik] using a word size of no more than 15bp (we typically use 11-14 with Novoalign at this stage). We find this to be a necessary step as many concordant pairs are missed in the first tier (a consequence of the tradeoff b/w speed and senitivity). In turn, these missed concordant pairs lead to false positive SV calls. At this point, you are merely trying to eliminate remaining concordant pairs.  Thus, if using Novoalign, you should use the "-r Random" alignment mode.  Below is an example for creating discordant FASTQ files from the tier1 discordant alignments:
+  # *Tier 2 alignment*. Grab the discordant alignments from the *tier 1* BAM files and create FASTQ files for the discordant pairs.  Align the tier 1 discordant pairs with a more sensitive aligner such as [http://www.novocraft.com Novoalign] or [http://code.google.com/p/mosaik-aligner/ Mosaik] using a word size of no more than 15bp (we typically use 11-14 with Novoalign at this stage). We find this to be a necessary step as many concordant pairs are missed in the first tier (a consequence of the tradeoff b/w speed and senitivity). In turn, these missed concordant pairs lead to false positive SV calls. At this point, you are merely trying to eliminate remaining concordant pairs.  Thus, if using Novoalign, you should use the "-r Random" alignment mode.  Below is an example for creating discordant FASTQ files from the tier1 discordant alignments and then aligning those reads to hg18 with Novoalign.  This assumes we have created an index of hg18 with novoindex using kmer size 14 and step size 1.  Let's assume that in step 1, you determine that your fragment library has a median of 500 and a standard deviation of 50.
+
 {{{
-$ samtools view -bF 0x2 <tier1.bam> | bamToFastq -bam stdin -fq1 tier1.disc.1.fq -fq2 tier1.disc.2.fq 
+$ samtools view -uF 2 sample.tier1.bam | \
+           bamToFastq -bam stdin \
+                      -fq1 sample.tier1.disc.1.fq \
+                      -fq2 sample.tier1.disc.2.fq
+
+$ novoalign -c <THREADS> -d hg18.k14s1 \
+                         -f sample.tier1.disc.1.fq sample.tier2.disc.2.fq \
+                         -i 500 50 -r Random -o SAM | \
+            samtools view -Sb - > sample.tier2.bam 
+
 }}}
+
+
   # *Tier 3 alignment*.  Grab the discordant alignments from the *tier 2* BAM files and create FASTQ files for the discordant pairs. Align the tier 2 discordant pairs with the same aligner from step 2 (or a more sensitive tool if you have the CPU cycles).  In this stage, however, we want to track *_all_* discordant alignment positions and use even more sensitive parameters such that any remaining "crypic" concordant pairs are detectable.  Retaining multiple mapping positions for the discordant pairs will allow us to detect SV involving duplicated/repetitive sequences such as segmental duplications and transposable elements.  Clearly this is an optional step: if you don't care about SV in duplicated sequence, only retain uniquely aligned reads---Hydra will work nonetheless.  If possible (i.e, if you have a sufficient number of CPUs), you should decrease the word size used for alignment to further eliminate remaining concordant pairs that may exist solely because a larger alignment seed was previously missed owing to sequence errors and/or polymorphism.  If using Novoalign, we recommend the following settings: -rE and -t at least 180, perhaps up to 300.
 {{{
 $ samtools view -bF 0x2 <tier2.bam> | bamToFastq -bam stdin -fq1 tier2.disc.1.fq -fq2 tier2.disc.2.fq 
