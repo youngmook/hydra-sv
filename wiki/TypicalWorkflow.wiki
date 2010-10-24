@@ -74,17 +74,13 @@ $ novoalign -c <THREADS> -d hg18.k14s1 \
 
 <br>
 
-*Create all discordant mapping combinations for each discordant read-pair.* Use the pairDiscordants.py script to screen for remaining concordant pairs and for all discordant pairs, create the mapping combinations for SV detection with Hydra.  pairDiscordants.py allows you to set the upper (-z) and lower (-y) bound for concordants (this should be derived by plotting the alignment distance of your pairs and computing median and m.a.d. values).  It also allows you to set the maximum number of mapping positions allowed for a given discordant pair.  We typically set this to 1000 (-n).  Use the "-m hydra" option to create output that is appropriate for use with Hydra. 
+*Create all discordant mapping combinations for each discordant read-pair.* Use the pairDiscordants.py script to screen for remaining concordant pairs and for all discordant pairs, create the mapping combinations for SV detection with Hydra.  pairDiscordants.py allows you to set the upper (-z) and lower (-y) bound for concordants (this should be derived by plotting the alignment distance of your pairs and computing median and m.a.d. values).  It also allows you to set the maximum number of mapping positions allowed for a given discordant pair.  We typically set this to 1000 (-n).  Use the "-m hydra" option to create output that is appropriate for use with Hydra. The other options used for pairDiscordants are based on the statistic of your library.  The numbers used here are based on the statistics computed in tier 1.
+
 {{{
-$ bamToBed -i sample.tier3.bam -tag NM | pairDiscordants.py -i stdin -m hydra [OPTIONS] > disc.bedpe
-}}}
-
-<br>
-
-
-*Remove alignments where both ends are in simple sequence repeats (opt., but strongly suggested).* SSRs and VNTRs are hyper-variable and prone to misassembly.  Consequently, a substantial number of spurious variants are often observed owing to SSR misassembly if mappings that touch SSRs on both ends are not removed prior to Hydra. We recommend using the pairToBed utility in BEDTools to do this.
-{{{
-$ pairToBed -a disc.bedpe -b SSRs.bed -type notboth | cut -f 1-12 > disc.noSSR.bedpe
+$ bamToBed -i sample.tier3.bam -tag NM | \
+           pairDiscordants.py -i stdin \
+                              -m hydra \
+                              -z 800 > sample.disc.bedpe
 }}}
 
 <br>
@@ -92,15 +88,15 @@ $ pairToBed -a disc.bedpe -b SSRs.bed -type notboth | cut -f 1-12 > disc.noSSR.b
 
 *Remove PCR and sequencing duplicates.*
 {{{
-$ dedupDiscordants.py -i disc.noSSR.bedpe [OPTIONS] > disc.noSSR.deduped.bedpe
+$ dedupDiscordants.py -i sample.disc.bedpe -s 3 > sample.disc.deduped.bedpe
 }}}
 
 <br>
 
 
-*Detect SV breakpoints with Hydra*
+*Detect SV breakpoints with Hydra*  The -mld and -mno values are based on the statistics computed in tier 2.  Use the Hydra help (-h) to find suggested approaches for computing the values for these parameters. 
 {{{
-$ hydra -i disc.deduped.noSSR.deduped.bedpe [OPTIONS]
+$ hydra -i sample.disc.deduped.bedpe -out sample.breaks -mld 500 -mno 1500
 }}}
 
 <br>
