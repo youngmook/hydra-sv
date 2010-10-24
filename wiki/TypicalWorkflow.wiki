@@ -5,14 +5,14 @@
 
 *Overview.*  
 <br>
-The pipeline described below is meant to describe a general approach that we have found to be effective for discovering SV breakpoints with Hydra. However, it should be noted that this approach seeks to discover breakpoints arising from both "unique" *and duplicated* (e.g., segmental duplications, recent retrotransposons).  Therefore, it includes a final step (Tier 3) that attempts to capture *mappings* for readpairs that align to such duplicated sequences.  Hydra then uses those mappings to search for transposon insertions and rearrangements among segmental duplications.  If you are not interested in these types of events, you can eliminate the Tier 3 alignment step.
+The pipeline described below is meant to convey a general approach that we have found to be effective for discovering SV breakpoints with Hydra. However, it should be noted that this approach seeks to discover breakpoints arising from both "unique" *and duplicated* (e.g., segmental duplications, recent retrotransposons).  Therefore, it includes a final step (Tier 3) that attempts to capture *mappings* for readpairs that align to such duplicated sequences.  Hydra then uses those mappings to search for transposon insertions and rearrangements among segmental duplications.  If you are not interested in these types of events, you can eliminate the Tier 3 alignment step.
 
 
 <br>
 
 *Why tiered alignment?*
 <br>
-We employ a tiered alignments strategy in order to optimize the tradeoff between alignment speed and sensitivity.  Clearly, we could just skip the first two tiers described below and simply align all readpairs with the extremely sensitive settings for Tier 3.  The problem is that this can take an extremely long time for large datasets.  A tiered alignment approach begins with a fast aligner to quickly identify "proper pairs" or "concordant pairs".  We then scrutinize the remaining "improper or discordant" pairs with a more sensitive aligner.  The motivation here is that the aligner from the first tier didn't have the sensitivity to identify that a discordant is actually concordant alignments.
+We employ a tiered alignment strategy in order to optimize the tradeoff between alignment speed and sensitivity.  Clearly, we could just skip the first two tiers described below and simply align all readpairs with the extremely sensitive settings for Tier 3.  The problem is that this can take an extremely long time for large datasets.  A tiered alignment approach begins with a fast aligner to quickly identify "proper pairs" or "concordant pairs".  We then scrutinize the remaining "improper or discordant" pairs with a more sensitive aligner.  The motivation here is that the aligner from the first tier didn't have the sensitivity to identify that a discordant is actually concordant alignments.
 
 <br>
 
