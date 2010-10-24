@@ -23,8 +23,16 @@ The pipeline below is based upon BWA and Novoalign, but is not meant to suggest 
 <br>
 
 
-*An example pipeline*
-  # *Tier 1 alignment*. Align your paired-end reads to the reference genome with a fast and reasonably sensitive aligner (e.g.,  [http://bio-bwa.sourceforge.net/ BWA] or [http://bowtie-bio.sourceforge.net/index.shtml Bowtie]). This step serves as an initial pass towards identifying concordant pairs.
+*An example pipeline.* The "$" denotes the command line prompt.
+
+  # *Tier 1 alignment*. This initial alignet step is meant to quickly identify (and remove) concordant readpairs from your alignment. Align your paired-end reads to the reference genome with a fast and reasonably sensitive aligner (e.g.,  [http://bio-bwa.sourceforge.net/ BWA] or [http://bowtie-bio.sourceforge.net/index.shtml Bowtie]). Here is an example for the BWA aligner against hg18 (assuming you have already created a BWT index of the genome).  We will create a BAM file by piping the BWA output directly to samtools.
+{{{
+$ bwa aln -t <THREADS> hg18 sample.1.fq > sample.1.sai
+$ bwa aln -t <THREADS> hg18 sample.2.fq > sample.2.sai
+$ bwa sampe hg18 sample.1.sai sample.2.sai sample.1.fq sample.2.fq | \
+      samtools view -Sb - > sample.bam 
+}}}
+
   # *Tier 2 alignment*. Grab the discordant alignments from the *tier 1* BAM files and create FASTQ files for the discordant pairs.  Align the tier 1 discordant pairs with a more sensitive aligner such as [http://www.novocraft.com Novoalign] or [http://code.google.com/p/mosaik-aligner/ Mosaik] using a word size of no more than 15bp (we typically use 11-14 with Novoalign at this stage). We find this to be a necessary step as many concordant pairs are missed in the first tier (a consequence of the tradeoff b/w speed and senitivity). In turn, these missed concordant pairs lead to false positive SV calls. At this point, you are merely trying to eliminate remaining concordant pairs.  Thus, if using Novoalign, you should use the "-r Random" alignment mode.  Below is an example for creating discordant FASTQ files from the tier1 discordant alignments:
 {{{
 $ samtools view -bF 0x2 <tier1.bam> | bamToFastq -bam stdin -fq1 tier1.disc.1.fq -fq2 tier1.disc.2.fq 
