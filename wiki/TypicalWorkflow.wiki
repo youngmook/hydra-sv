@@ -62,7 +62,7 @@ $ novoalign -c <THREADS> -d hg18.k14s1 \
 $ samtools view -uF 2 sample.tier2.bam | \
            bamToFastq -bam stdin \
            -fq1 sample.tier2.disc.1.fq \
-           -fq2 sample.tier2.disc.1.fq
+           -fq2 sample.tier2.disc.2.fq
 
 $ novoalign -c <THREADS> -d hg18.k14s1 \
                          -f sample.tier2.disc.1.fq sample.tier2.disc.2.fq \
