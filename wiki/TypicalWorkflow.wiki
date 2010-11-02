@@ -34,7 +34,8 @@ The "$" denotes the command line prompt.
 {{{
 $ bwa aln -t <THREADS> hg18 sample.1.fq > sample.1.sai
 $ bwa aln -t <THREADS> hg18 sample.2.fq > sample.2.sai
-$ bwa sampe hg18 sample.1.sai sample.2.sai sample.1.fq sample.2.fq | \
+$ bwa sampe hg18 sample.1.sai sample.2.sai  \
+                 sample.1.fq  sample.2.fq | \
       samtools view -Sb - > sample.tier1.bam 
 }}}
 
