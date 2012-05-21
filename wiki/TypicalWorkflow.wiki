@@ -97,7 +97,7 @@ $ dedupDiscordants.py -i sample.disc.bedpe -s 3 > sample.disc.deduped.bedpe
 
 *Detect SV breakpoints with Hydra*  The -mld and -mno values are based on the statistics computed in tier 2.  Use the Hydra help (-h) to find suggested approaches for computing the values for these parameters. 
 {{{
-$ hydra -i sample.disc.deduped.bedpe -out sample.breaks -mld 500 -mno 1500
+$ hydra -in sample.disc.deduped.bedpe -out sample.breaks -mld 500 -mno 1500
 }}}
 
 <br>
